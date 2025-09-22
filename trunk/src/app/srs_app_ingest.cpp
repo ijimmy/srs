@@ -433,8 +433,10 @@ srs_error_t SrsIngester::initialize_ffmpeg(SrsFFMPEG *ffmpeg, SrsConfDirective *
             return srs_error_new(ERROR_ENCODER_NO_INPUT, "empty intput url, ingest=%s", ingest->arg0().c_str());
         }
 
-        // For stream, also use -re, to ingest HLS better.
-        ffmpeg->append_iparam("-re");
+        // For stream, if it is HLS, also use -re, to ingest HLS better.
+        if (input_url.find("m3u8") != std::string::npos) {
+            ffmpeg->append_iparam("-re");
+        }
 
         if ((err = ffmpeg->initialize(input_url, output, log_file)) != srs_success) {
             return srs_error_wrap(err, "init ffmpeg");
